@@ -6,7 +6,9 @@ const errorDisplay = document.getElementById("errors");
 const resultTime = document.getElementById("result-time");
 const resultErrors = document.getElementById("result-errors");
 const resultSpeed = document.getElementById("result-speed");
+const testCountDisplay = document.getElementById("test-count");
 
+let completedTests = [];
 let quote = "";
 let time = 0;
 let timer = null;
@@ -29,7 +31,7 @@ const renderNewQuote = async () => {
     } catch (error) {
         console.error("Error fetching quote:", error);
     }
-};
+}
 
 const startTest = () => {
     mistakes = 0;
@@ -89,9 +91,23 @@ const displayResult = () => {
     let words = quote.split(" ").length;
     let wpm = Math.round((words / time) * 60);
     resultSpeed.innerText = isFinite(wpm) ? wpm : 0; // Prevent NaN issue if time is 0
+
+    completedTests.push({
+        timestamp: new Date().toLocaleString(),
+        timeTaken: time,
+        errors: mistakes,
+        wordsPerMinute: wpm ? wpm : 0
+    }); // Store test details in array
+
+    if (testCountDisplay) {
+        testCountDisplay.innerText = completedTests.length;
+    } else {
+        console.error("Error: testCountDisplay element not found!");
+    } // Update/display count of completed tests
 }; 
 
 window.onload = () => {
     renderNewQuote();
     document.getElementById("stop-test").style.display = "none"; // Hide stop button initially
 }; 
+
