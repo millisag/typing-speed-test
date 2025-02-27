@@ -85,6 +85,12 @@ const displayResult = () => {
     document.getElementById("stop-test").style.display = "none"; // Hide stop button
     document.getElementById("start-test").style.display = "block"; // Show start button
 
+    if (mistakes > 0) {
+        alert("The text does not match. Please try again.");
+        startTest(); // Restart the test if there are mistakes
+        return; // Exit the function early
+    }
+
     resultTime.innerText = time;
     resultErrors.innerText = mistakes;
 
