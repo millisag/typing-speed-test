@@ -79,6 +79,17 @@ userInput.addEventListener("input", () => {
     }
 });
 
+arrayDetails = function() {
+    console.log("Completed Tests:");
+    completedTests.forEach((test, index) => {
+        console.log(`Test ${index + 1}:`);
+        console.log(`Timestamp: ${test.timestamp}`);
+        console.log(`Time Taken: ${test.timeTaken} seconds`);
+        console.log(`Errors: ${test.errors}`);
+        console.log(`Words Per Minute: ${test.wordsPerMinute}`);
+    });
+}; // Display completed tests in console
+
 const displayResult = () => {
     clearInterval(timer); // Stop the timer when "Stop Test" is clicked
     document.querySelector(".result").style.display = "block"; // Show result
