@@ -1,3 +1,5 @@
+// Everything is loaded dynamically on one page 
+
 const apiUrl = "https://api.quotable.io/random";
 const quoteSection = document.getElementById("quote"); 
 const userInput = document.getElementById("quote-input");
@@ -13,6 +15,7 @@ let quote = "";
 let time = 0;
 let timer = null;
 let mistakes = 0;
+let testStarted = false; // Track whether test is started
 
 const renderNewQuote = async () => {
     try {
@@ -26,8 +29,11 @@ const renderNewQuote = async () => {
             span.classList.add("quote-chars");
             span.innerText = char;
             quoteSection.appendChild(span);
-        }); // Convert quote text into spans for character accuracy comparison
+        }); // Convert quote text into spans for character comparison
         userInput.value = ""; // Clear input field  when new quote is displayed
+        userInput.disabled = false; // Enable input
+        testStarted = false; // Reset test start tracking
+
     } catch (error) {
         console.error("Error fetching quote:", error);
     }
@@ -46,9 +52,8 @@ const startTest = () => {
 
     document.querySelector(".result").style.display = "none"; // Hide result when restarting
     document.getElementById("stop-test").style.display = "block"; // Show stop button
-    document.getElementById("start-test").style.display = "none"; // Hide start button
+    // document.getElementById("start-test").style.display = "none"; // Hide start button
     
-    renderNewQuote(); // Get a new quote
 };
 
 function updateTimer() {
@@ -57,25 +62,32 @@ function updateTimer() {
 } // Update timer
 
 userInput.addEventListener("input", () => {
+    if (!testStarted) {
+        startTest(); // Start the test when user types the first character
+        testStarted = true;
+    }
+    
     let quoteChars = document.querySelectorAll(".quote-chars");
     let userInputChars = userInput.value.split("");
 
     mistakes = 0;
+    let isComplete = userInput.value.length === quote.length; // Check whether length of user input matches quote exactly
+
     quoteChars.forEach((char, index) => {
         if (userInputChars[index] === char.innerText) {
             char.classList.add("correct");
-            char.classList.remove("incorrect");
+            char.classList.remove("incorrect"); // Correct: green
         } else if (userInputChars[index]) {
             char.classList.add("incorrect");
-            char.classList.remove("correct");
+            char.classList.remove("correct"); // Incorrect: red
             mistakes++;
         }
-    }); // Check input accuracy for each character
+    }); 
 
     errorDisplay.innerText = mistakes;
 
-    if (userInput.value === quote) {
-        displayResult(); // Stop test when user finishes typing
+    if (isComplete && userInput.value === quote) {
+        displayResult(); // Stop test when user finishes typing correct input
     }
 });
 
@@ -94,11 +106,11 @@ const displayResult = () => {
     clearInterval(timer); // Stop the timer when "Stop Test" is clicked
     document.querySelector(".result").style.display = "block"; // Show result
     document.getElementById("stop-test").style.display = "none"; // Hide stop button
-    document.getElementById("start-test").style.display = "block"; // Show start button
 
-    if (mistakes > 0) {
+    // document.getElementById("start-test").style.display = "block"; // Show start button
+    if (mistakes > 0 || userInput.value !== quote) {
         alert("The text does not match. Please try again.");
-        startTest(); // Restart the test if there are mistakes
+        renderNewQuote(); // Reload a new quote instead of restarting test
         return; // Exit the function early
     }
 
@@ -119,12 +131,28 @@ const displayResult = () => {
     if (testCountDisplay) {
         testCountDisplay.innerText = completedTests.length;
     } else {
-        console.error("Error: testCountDisplay element not found!");
+        console.error("Error: testCountDisplay element not found!"); // Error handling
     } // Update/display count of completed tests
-}; 
+
+    // Load a new quote after successfully completing a test
+    setTimeout(renderNewQuote, 5000); // Wait 5 seconds before loading a new quote
+} 
 
 window.onload = () => {
     renderNewQuote();
+    
+    /* if (timeDisplay) {
+        timeDisplay.innerText = "0"; // Ensure timer is visible at page load
+        timeDisplay.display = "block";
+    } else {
+        console.error("Error: timeDisplay element not found!");
+    }
+
+    if (errorDisplay) {
+        errorDisplay.innerText = "0"; // Ensure error counter is visible at page load
+    } else {
+        console.error("Error: errorDisplay element not found!");
+    } */
+
     document.getElementById("stop-test").style.display = "none"; // Hide stop button initially
 }; 
-

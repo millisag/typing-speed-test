@@ -75,3 +75,10 @@ button {
     border-radius: 5px;
     background-color: #f4f4f4;
 }
+.correct {
+    color: green;
+}
+
+.incorrect {
+    color: red;
+}
